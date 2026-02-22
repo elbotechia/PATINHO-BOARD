@@ -39,6 +39,20 @@
     font-size: .9rem; transition: color .2s;
   }
   nav a:hover, nav a.active { color: var(--text); }
+  .nav-user { display: flex; align-items: center; gap: .75rem; }
+  .avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; color: #000; text-decoration: none;
+    flex-shrink: 0;
+  }
+  .btn-logout {
+    background: transparent; border: none; color: var(--muted);
+    font-size: .85rem; cursor: pointer; padding: .3rem .5rem; border-radius: 6px;
+    transition: color .2s;
+  }
+  .btn-logout:hover { color: var(--red, #f85149); }
 
   /* ── Layout ── */
   .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
@@ -112,11 +126,26 @@
 <body>
 
 <header>
-  <a class="logo" href="/"><span>🦆</span> PATINHO-BOARD</a>
+  <a class="logo" href="/index.html">
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
   <nav>
-    <a href="/" class="active">Dashboard</a>
+    <a href="/index.html" class="active">Dashboard</a>
     <a href="/board.html">Board</a>
+    <a href="/profile.html">Perfil</a>
+    <a href="/settings.html">Configurações</a>
   </nav>
+  <div class="nav-user">
+    <a href="/profile.html" class="avatar-placeholder" id="headerAvatar" title="Meu perfil">?</a>
+    <button class="btn-logout" onclick="logout()" title="Sair">Sair</button>
+  </div>
 </header>
 
 <main class="page">
@@ -176,6 +205,33 @@
 
 <script>
 const API = '/api';
+
+// ── Auth guard ────────────────────────────────────────────────────────────────
+function getToken() { return localStorage.getItem('patinho_token'); }
+function logout() {
+  localStorage.removeItem('patinho_token');
+  localStorage.removeItem('patinho_user');
+  window.location.replace('/home.html');
+}
+
+const _token = getToken();
+if (!_token) {
+  window.location.replace('/home.html');
+} else {
+  fetch('/api/auth/me', { headers: { Authorization: `Bearer ${_token}` } })
+    .then(r => {
+      if (!r.ok) { logout(); return null; }
+      return r.json();
+    })
+    .then(data => {
+      if (!data) return;
+      const u = data.user;
+      const av = document.getElementById('headerAvatar');
+      if (av) av.textContent = u.username.charAt(0).toUpperCase();
+    })
+    .catch(logout);
+}
+
 
 const LANG_ICONS = {
   javascript: '🟨', typescript: '🔷', python: '🐍',
