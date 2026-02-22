@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PATINHO-BOARD — Entrar</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #30363d;
+    --accent:  #58a6ff;
+    --red:     #f85149;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --radius:  10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; display: grid;
+    grid-template-rows: 60px 1fr; 
+  }
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+  .main {
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1.5rem;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(88,166,255,.08) 0%, transparent 70%);
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem 2rem;
+    width: 100%; max-width: 400px;
+  }
+  .card-logo { text-align: center; margin-bottom: 1.75rem; }
+  .card-logo svg { display: block; margin: 0 auto .75rem; }
+  .card-logo h1 { font-size: 1.35rem; font-weight: 700; }
+  .card-logo p  { font-size: .85rem; color: var(--muted); margin-top: .3rem; }
+
+  .form-group { margin-bottom: 1.1rem; }
+  label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: .4rem; font-weight: 500; }
+  input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding: .65rem 1rem;
+    font-size: .9rem; transition: border-color .2s;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+    width: 100%; padding: .7rem 1.2rem; border-radius: var(--radius);
+    font-size: .95rem; font-weight: 600; cursor: pointer; border: none;
+    text-decoration: none; transition: opacity .2s; margin-top: .5rem;
+  }
+  .btn:hover { opacity: .85; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #000; }
+
+  .divider { text-align: center; font-size: .8rem; color: var(--muted); margin: 1.25rem 0; position: relative; }
+  .divider::before, .divider::after {
+    content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border);
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+
+  .link-row { text-align: center; font-size: .85rem; color: var(--muted); margin-top: 1.25rem; }
+  .link-row a { color: var(--accent); text-decoration: none; }
+  .link-row a:hover { text-decoration: underline; }
+
+  .alert { padding: .7rem 1rem; border-radius: var(--radius); font-size: .85rem; margin-bottom: 1rem; display: none; }
+  .alert-error { background: rgba(248,81,73,.12); border: 1px solid rgba(248,81,73,.3); color: var(--red); }
+  .alert.show { display: block; }
+
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.3); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/home.html">
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
+  <a href="/register.html" style="font-size:.85rem;color:var(--muted);text-decoration:none">Criar conta →</a>
+</header>
+
+<main class="main">
+  <div class="card">
+    <div class="card-logo">
+      <svg width="52" height="52" viewBox="0 0 48 48" fill="none">
+        <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+        <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+        <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+        <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+        <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+        <path d="M15 38 Q12 42 10 44" stroke="#4090e0" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M20 40 Q19 44 18 46" stroke="#4090e0" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h1>Bem-vindo de volta</h1>
+      <p>Entre na sua conta para acessar o board</p>
+    </div>
+
+    <div class="alert alert-error" id="alert"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">Entrar</button>
+    </form>
+
+    <div class="link-row">
+      Não tem conta? <a href="/register.html">Cadastre-se grátis</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Redireciona se já autenticado
+  const token = localStorage.getItem('patinho_token');
+  if (token) {
+    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => { if (r.ok) window.location.replace('/index.html'); })
+      .catch(() => {});
+  }
+
+  const form      = document.getElementById('loginForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const alert     = document.getElementById('alert');
+
+  function showError(msg) {
+    alert.textContent = msg;
+    alert.classList.add('show');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alert.classList.remove('show');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Entrando…';
+
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          email:    document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.error || 'Erro ao fazer login.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar';
+        return;
+      }
+
+      localStorage.setItem('patinho_token', data.token);
+      localStorage.setItem('patinho_user',  JSON.stringify(data.user));
+      window.location.replace('/index.html');
+    } catch {
+      showError('Erro de conexão. Tente novamente.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Entrar';
+    }
+  });
+</script>
+</body>
+</html>

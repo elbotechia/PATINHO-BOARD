@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PATINHO-BOARD — Perfil</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2128;
+    --border:   #30363d;
+    --accent:   #58a6ff;
+    --green:    #3fb950;
+    --yellow:   #d29922;
+    --purple:   #bc8cff;
+    --red:      #f85149;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --radius:   10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: .9rem; transition: color .2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  .nav-user { display: flex; align-items: center; gap: .75rem; }
+  .avatar-sm {
+    width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+    background: var(--border); border: 2px solid var(--border);
+  }
+  .avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; color: #000;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem;
+    display: grid; grid-template-columns: 280px 1fr; gap: 2rem;
+  }
+  @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ── Aside: perfil ── */
+  aside { display: flex; flex-direction: column; gap: 1rem; }
+  .profile-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem; text-align: center;
+  }
+  .avatar-lg {
+    width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+    margin: 0 auto 1rem;
+    border: 3px solid var(--border);
+  }
+  .avatar-lg-placeholder {
+    width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; color: #000;
+  }
+  .profile-name  { font-size: 1.15rem; font-weight: 700; margin-bottom: .3rem; }
+  .profile-email { font-size: .82rem; color: var(--muted); margin-bottom: .75rem; }
+  .profile-bio   { font-size: .85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+  .profile-meta  { display: flex; gap: 1rem; justify-content: center; font-size: .8rem; color: var(--muted); }
+  .profile-meta strong { color: var(--text); display: block; font-size: 1.1rem; }
+
+  .btn-settings {
+    display: flex; align-items: center; justify-content: center; gap: .45rem;
+    width: 100%; padding: .6rem 1rem; border-radius: var(--radius);
+    font-size: .88rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+    background: transparent; color: var(--text); text-decoration: none;
+    transition: border-color .2s, color .2s; margin-top: 1rem;
+  }
+  .btn-settings:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Main: perguntas ── */
+  .section-title {
+    font-size: .78rem; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1rem;
+  }
+  .question-list { display: flex; flex-direction: column; gap: .75rem; }
+  .q-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    text-decoration: none; color: inherit; display: block;
+    transition: border-color .2s;
+  }
+  .q-item:hover { border-color: var(--accent); }
+  .q-title  { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+  .q-meta   { display: flex; align-items: center; gap: .6rem; font-size: .78rem; color: var(--muted); flex-wrap: wrap; }
+  .badge {
+    display: inline-block; padding: .15rem .5rem; border-radius: 20px;
+    font-size: .72rem; font-weight: 600; border: 1px solid;
+  }
+  .badge-lang  { color: var(--accent); border-color: var(--accent); background: rgba(88,166,255,.1); }
+  .badge-green { color: var(--green);  border-color: var(--green);  background: rgba(63,185,80,.1); }
+  .badge-tag   { color: var(--muted);  border-color: var(--border); background: transparent; }
+
+  .empty { color: var(--muted); font-size: .9rem; padding: 2rem; text-align: center; }
+  .skeleton { background: var(--border); border-radius: 6px; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .sk-line { height: 14px; margin-bottom: 8px; }
+
+  .logout-btn {
+    background: transparent; border: 1px solid rgba(248,81,73,.3); color: var(--red);
+    width: 100%; padding: .55rem 1rem; border-radius: var(--radius);
+    font-size: .85rem; font-weight: 600; cursor: pointer; transition: background .2s;
+  }
+  .logout-btn:hover { background: rgba(248,81,73,.1); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/index.html">
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
+  <nav>
+    <a href="/index.html">Dashboard</a>
+    <a href="/board.html">Board</a>
+    <a href="/profile.html" class="active">Perfil</a>
+    <a href="/settings.html">Configurações</a>
+  </nav>
+  <div class="nav-user">
+    <div class="avatar-placeholder" id="headerAvatar">?</div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ── Aside ── -->
+  <aside>
+    <div class="profile-card">
+      <div id="avatarWrap">
+        <div class="avatar-lg-placeholder" id="avatarPlaceholder">?</div>
+      </div>
+      <div class="profile-name"  id="profileName">—</div>
+      <div class="profile-email" id="profileEmail">—</div>
+      <div class="profile-bio"   id="profileBio"></div>
+      <div class="profile-meta">
+        <div>
+          <strong id="qCount">0</strong>
+          perguntas
+        </div>
+        <div>
+          <strong id="memberSince">—</strong>
+          membro desde
+        </div>
+      </div>
+      <a href="/settings.html" class="btn-settings">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        Editar perfil
+      </a>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sair da conta</button>
+  </aside>
+
+  <!-- ── Main: perguntas ── -->
+  <main>
+    <div class="section-title" id="questionsTitle">Perguntas</div>
+    <div class="question-list" id="questionList">
+      <!-- skeletons -->
+      <div class="q-item"><div class="skeleton sk-line" style="width:70%"></div><div class="skeleton sk-line" style="width:40%"></div></div>
+      <div class="q-item"><div class="skeleton sk-line" style="width:85%"></div><div class="skeleton sk-line" style="width:35%"></div></div>
+      <div class="q-item"><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-line" style="width:50%"></div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const LANG_ICONS = { javascript:'🟨',typescript:'🔷',python:'🐍',java:'☕','c++':'⚙️','c#':'💜',php:'🐘',ruby:'💎',go:'🐹',rust:'🦀',html:'🌐',css:'🎨' };
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function getToken() { return localStorage.getItem('patinho_token'); }
+
+function logout() {
+  localStorage.removeItem('patinho_token');
+  localStorage.removeItem('patinho_user');
+  window.location.replace('/home.html');
+}
+
+// Guard
+const token = getToken();
+if (!token) window.location.replace('/home.html');
+
+async function init() {
+  try {
+    // Busca dados do usuário logado
+    const meRes  = await fetch('/api/users/me', { headers: { Authorization: `Bearer ${token}` } });
+    if (!meRes.ok) { logout(); return; }
+    const { user } = await meRes.json();
+
+    // Popula aside
+    document.getElementById('profileName').textContent  = user.username;
+    document.getElementById('profileEmail').textContent = user.email;
+    document.getElementById('profileBio').textContent   = user.bio || 'Sem bio ainda. Edite seu perfil!';
+
+    const since = new Date(user.createdAt);
+    document.getElementById('memberSince').textContent = since.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+
+    // Avatar
+    const wrap = document.getElementById('avatarWrap');
+    if (user.avatarUrl) {
+      wrap.innerHTML = `<img class="avatar-lg" src="${user.avatarUrl}" alt="avatar" />`;
+    } else {
+      document.getElementById('avatarPlaceholder').textContent = user.username.charAt(0).toUpperCase();
+    }
+    document.getElementById('headerAvatar').textContent = user.username.charAt(0).toUpperCase();
+
+    // Busca perguntas do usuário
+    const qRes  = await fetch(`/api/users/${user._id}/questions`, { headers: { Authorization: `Bearer ${token}` } });
+    const { questions } = await qRes.json();
+
+    document.getElementById('qCount').textContent = questions.length;
+    document.getElementById('questionsTitle').textContent = `Perguntas (${questions.length})`;
+
+    const list = document.getElementById('questionList');
+    if (!questions.length) {
+      list.innerHTML = '<div class="empty">Você ainda não fez nenhuma pergunta. <a href="/board.html" style="color:var(--accent)">Fazer primeira pergunta →</a></div>';
+      return;
+    }
+
+    list.innerHTML = questions.map(q => {
+      const tags = (q.tags || []).slice(0, 3).map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
+      const ans  = q.answers?.length || 0;
+      const date = new Date(q.createdAt).toLocaleDateString('pt-BR');
+      return `
+        <a class="q-item" href="/board.html#q${q._id}">
+          <div class="q-title">${escHtml(q.title)}</div>
+          <div class="q-meta">
+            <span class="badge badge-lang">${LANG_ICONS[q.language]||'💻'} ${q.language}</span>
+            ${ans ? `<span class="badge badge-green">✔ ${ans} resp.</span>` : '<span style="color:var(--muted);font-size:.75rem">sem respostas</span>'}
+            ${tags}
+            <span>👁 ${q.views || 0}</span>
+            <span>${date}</span>
+          </div>
+        </a>`;
+    }).join('');
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
