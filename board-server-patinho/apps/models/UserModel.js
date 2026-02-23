@@ -44,11 +44,10 @@ const userSchema = new mongoose.Schema(
 );
 
 // ── Hash da senha antes de salvar ─────────────────────────────────────────────
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     const cost  = parseInt(process.env.BCRYPT_COST, 10) || 12;
     this.password = await bcrypt.hash(this.password, cost);
-    next();
 });
 
 // ── Método de instância: compara senha em texto plano com o hash ───────────────
