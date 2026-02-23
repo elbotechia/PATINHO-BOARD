@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PATINHO-BOARD — Início</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #30363d;
+    --accent:  #58a6ff;
+    --green:   #3fb950;
+    --text:    #e6edf3;
+    --muted:   #8b949e;
+    --radius:  10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* ── Header ── */
+  header {
+    background: rgba(22,27,34,.85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+  .header-btns { display: flex; gap: .75rem; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .55rem 1.2rem; border-radius: var(--radius);
+    font-size: .9rem; font-weight: 600; cursor: pointer;
+    border: none; text-decoration: none; transition: opacity .2s, transform .15s;
+  }
+  .btn:hover { opacity: .85; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary  { background: var(--accent); color: #000; }
+  .btn-outline  { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-lg { padding: .8rem 2rem; font-size: 1rem; border-radius: 12px; }
+  .btn-ghost { background: transparent; color: var(--muted); }
+  .btn-ghost:hover { color: var(--text); }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 1.5rem 4rem;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(88,166,255,.12) 0%, transparent 70%);
+  }
+  .duck-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 120px; height: 120px; margin: 0 auto 2rem;
+    background: linear-gradient(135deg, rgba(88,166,255,.15), rgba(88,166,255,.05));
+    border: 2px solid rgba(88,166,255,.3); border-radius: 28px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800; line-height: 1.15;
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 1.2rem;
+  }
+  .hero p {
+    font-size: clamp(.95rem, 2.5vw, 1.2rem); color: var(--muted);
+    max-width: 560px; line-height: 1.7; margin: 0 auto 2.5rem;
+  }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+  /* ── Scroll indicator ── */
+  .scroll-hint {
+    margin-top: 3rem; color: var(--muted); font-size: .8rem;
+    display: flex; flex-direction: column; align-items: center; gap: .4rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+  /* ── Features section ── */
+  .features {
+    max-width: 1000px; margin: 0 auto; padding: 5rem 1.5rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
+  }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+    transition: border-color .2s, transform .2s;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+  .feature-card p  { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── CTA final ── */
+  .cta-section {
+    text-align: center; padding: 5rem 1.5rem;
+    background: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(88,166,255,.08) 0%, transparent 70%);
+  }
+  .cta-section h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: .75rem; }
+  .cta-section p  { color: var(--muted); margin-bottom: 2rem; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 1.5rem;
+    text-align: center; font-size: .8rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/home.html">
+    <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9"  ry="9"  fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+      <path d="M15 38 Q12 42 10 44" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M20 40 Q19 44 18 46" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
+  <div class="header-btns">
+    <a href="/login.html"    class="btn btn-ghost">Entrar</a>
+    <a href="/register.html" class="btn btn-primary">Cadastrar</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="duck-icon">
+    <svg width="72" height="72" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9"  ry="9"  fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+      <ellipse cx="17" cy="32" rx="3" ry="1.5" fill="#4090e0" opacity=".5"/>
+      <path d="M15 38 Q12 42 10 44" stroke="#4090e0" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M20 40 Q19 44 18 46" stroke="#4090e0" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <h1>Tire suas dúvidas de<br/>programação com estilo</h1>
+  <p>PATINHO-BOARD é o seu espaço colaborativo para fazer perguntas técnicas, compartilhar código e aprender com a comunidade.</p>
+
+  <div class="hero-btns">
+    <a href="/login.html"    class="btn btn-primary btn-lg">Entrar na plataforma →</a>
+    <a href="/register.html" class="btn btn-outline btn-lg">Criar conta grátis</a>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Conheça mais</span>
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
+  </div>
+</section>
+
+<section id="features" class="features">
+  <div class="feature-card">
+    <div class="feature-icon">💬</div>
+    <h3>Perguntas & Respostas</h3>
+    <p>Faça perguntas técnicas detalhadas com suporte a trechos de código e veja a comunidade responder.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔍</div>
+    <h3>Busca avançada</h3>
+    <p>Filtre por linguagem, tags ou palavras-chave e encontre exatamente o que precisa em segundos.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">✅</div>
+    <h3>Respostas aceitas</h3>
+    <p>Marque a melhor resposta como aceita e ajude outros desenvolvedores com o mesmo problema.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📊</div>
+    <h3>Dashboard inteligente</h3>
+    <p>Acompanhe estatísticas, linguagens mais populares e as perguntas mais recentes em um painel.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">👤</div>
+    <h3>Perfil personalizado</h3>
+    <p>Configure seu avatar, bio e veja todas as suas perguntas organizadas no seu perfil.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔒</div>
+    <h3>Autenticação segura</h3>
+    <p>Conta protegida com JWT e bcrypt. Seus dados sempre seguros e criptografados.</p>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Pronto para mergulhar?</h2>
+  <p>Junte-se à comunidade e comece a aprender e compartilhar hoje.</p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <a href="/register.html" class="btn btn-primary btn-lg">Criar conta grátis</a>
+    <a href="/login.html"    class="btn btn-outline btn-lg">Já tenho conta</a>
+  </div>
+</section>
+
+<footer>
+  © 2026 PATINHO-BOARD · Feito com 🦆 e muito café
+</footer>
+
+<script>
+  // Se já está autenticado, redireciona direto ao dashboard
+  const token = localStorage.getItem('patinho_token');
+  if (token) {
+    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => { if (r.ok) window.location.replace('/index.html'); })
+      .catch(() => {});
+  }
+</script>
+</body>
+</html>

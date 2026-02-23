@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PATINHO-BOARD — Configurações</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2128;
+    --border:   #30363d;
+    --accent:   #58a6ff;
+    --green:    #3fb950;
+    --red:      #f85149;
+    --purple:   #bc8cff;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --radius:   10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: .9rem; transition: color .2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  .avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; color: #000;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem;
+    display: grid; grid-template-columns: 260px 1fr; gap: 2rem;
+  }
+  @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ── Aside: info atual ── */
+  aside { display: flex; flex-direction: column; gap: 1rem; }
+  .profile-preview {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.5rem; text-align: center;
+  }
+  .avatar-wrap { position: relative; display: inline-block; margin: 0 auto 1rem; cursor: pointer; }
+  .avatar-lg {
+    width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--border); display: block;
+    transition: filter .2s;
+  }
+  .avatar-lg-placeholder {
+    width: 90px; height: 90px; border-radius: 50%; margin: 0 auto;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; color: #000;
+    transition: filter .2s;
+  }
+  .avatar-wrap:hover .avatar-lg,
+  .avatar-wrap:hover .avatar-lg-placeholder { filter: brightness(.6); }
+  .avatar-overlay {
+    position: absolute; inset: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .2s; pointer-events: none;
+    font-size: .7rem; color: white; font-weight: 600; text-align: center;
+    background: rgba(0,0,0,.4);
+  }
+  .avatar-wrap:hover .avatar-overlay { opacity: 1; }
+  #avatarInput { display: none; }
+
+  .preview-name  { font-size: 1rem; font-weight: 700; }
+  .preview-email { font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+  .preview-bio   { font-size: .82rem; color: var(--muted); margin-top: .6rem; line-height: 1.5; }
+
+  .avatar-upload-btn {
+    display: block; width: 100%; margin-top: 1rem; padding: .55rem .9rem;
+    background: transparent; border: 1px dashed var(--border); border-radius: var(--radius);
+    color: var(--muted); font-size: .82rem; cursor: pointer; text-align: center;
+    transition: border-color .2s, color .2s;
+  }
+  .avatar-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .nav-aside a {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .55rem .75rem; border-radius: var(--radius);
+    font-size: .88rem; color: var(--muted); text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .nav-aside a:hover { background: var(--border); color: var(--text); }
+  .nav-aside a.active { background: rgba(88,166,255,.15); color: var(--accent); font-weight: 600; }
+
+  /* ── Main: form ── */
+  main { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .settings-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .section-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+    font-size: .88rem; font-weight: 700;
+  }
+  .section-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .form-group { display: flex; flex-direction: column; gap: .4rem; }
+  label { font-size: .82rem; color: var(--muted); font-weight: 500; }
+  input, textarea {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding: .65rem 1rem;
+    font-size: .9rem; transition: border-color .2s; resize: vertical;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .hint { font-size: .75rem; color: var(--muted); }
+
+  .form-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.3rem; border-radius: var(--radius);
+    font-size: .9rem; font-weight: 600; cursor: pointer; border: none;
+    text-decoration: none; transition: opacity .2s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-ghost   { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+  .alert { padding: .6rem 1rem; border-radius: var(--radius); font-size: .82rem; display: none; }
+  .alert-error   { background: rgba(248,81,73,.12); border: 1px solid rgba(248,81,73,.3); color: var(--red); }
+  .alert-success { background: rgba(63,185,80,.12); border: 1px solid rgba(63,185,80,.3); color: var(--green); }
+  .alert.show { display: block; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,.3); border-top-color: #000; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Avatar upload progress */
+  .upload-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; display: none; margin-top: .5rem; }
+  .upload-bar { height: 100%; border-radius: 2px; background: var(--accent); width: 0; transition: width .3s; }
+  .upload-bar-wrap.show { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/index.html">
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
+  <nav>
+    <a href="/index.html">Dashboard</a>
+    <a href="/board.html">Board</a>
+    <a href="/profile.html">Perfil</a>
+    <a href="/settings.html" class="active">Configurações</a>
+  </nav>
+  <div class="avatar-placeholder" id="headerAvatar">?</div>
+</header>
+
+<div class="layout">
+  <!-- ── Aside ── -->
+  <aside>
+    <!-- Preview do perfil atual -->
+    <div class="profile-preview">
+      <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()" title="Clique para trocar a foto">
+        <div id="avatarDisplay">
+          <div class="avatar-lg-placeholder" id="avatarPlaceholder">?</div>
+        </div>
+        <div class="avatar-overlay">📷<br/>Trocar foto</div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" />
+
+      <div class="upload-bar-wrap" id="uploadBarWrap"><div class="upload-bar" id="uploadBar"></div></div>
+      <div class="alert alert-error"   id="avatarError"   style="margin-top:.75rem;text-align:left"></div>
+      <div class="alert alert-success" id="avatarSuccess" style="margin-top:.75rem;text-align:left"></div>
+
+      <div class="preview-name"  id="previewName">—</div>
+      <div class="preview-email" id="previewEmail">—</div>
+      <div class="preview-bio"   id="previewBio"></div>
+
+      <button class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">
+        📷 Trocar foto de perfil
+      </button>
+    </div>
+
+    <!-- Navegação das configurações -->
+    <nav class="nav-aside">
+      <a href="#perfil" class="active">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Informações do perfil
+      </a>
+      <a href="#seguranca">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Segurança
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── Main: seções ── -->
+  <main>
+    <!-- Seção: Informações do perfil -->
+    <div class="settings-section" id="perfil">
+      <div class="section-header">Informações do perfil</div>
+      <div class="section-body">
+        <div class="alert alert-error"   id="profileError"></div>
+        <div class="alert alert-success" id="profileSuccess"></div>
+        <div class="form-group">
+          <label for="username">Nome de usuário</label>
+          <input type="text" id="username" placeholder="pato_dev" minlength="3" maxlength="30" />
+          <div class="hint">Entre 3 e 30 caracteres. Sem espaços.</div>
+        </div>
+        <div class="form-group">
+          <label for="bio">Bio</label>
+          <textarea id="bio" rows="3" maxlength="300" placeholder="Fale um pouco sobre você…"></textarea>
+          <div class="hint"><span id="bioCount">0</span>/300 caracteres</div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="saveProfileBtn" onclick="saveProfile()">Salvar alterações</button>
+          <a href="/profile.html" class="btn btn-ghost">Ver perfil</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Segurança (email - somente leitura, placeholder para futuro) -->
+    <div class="settings-section" id="seguranca">
+      <div class="section-header">Segurança da conta</div>
+      <div class="section-body">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="emailDisplay" disabled style="opacity:.6;cursor:not-allowed" />
+          <div class="hint">O e-mail não pode ser alterado no momento.</div>
+        </div>
+        <div class="form-group">
+          <label>Membro desde</label>
+          <input type="text" id="memberSince" disabled style="opacity:.6;cursor:not-allowed" />
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function getToken() { return localStorage.getItem('patinho_token'); }
+const token = getToken();
+if (!token) window.location.replace('/home.html');
+
+let currentUser = null;
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showAlert(id, msg, type='error') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert alert-${type} show`;
+}
+function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+
+function renderUser(user) {
+  currentUser = user;
+  document.getElementById('previewName').textContent  = user.username;
+  document.getElementById('previewEmail').textContent = user.email;
+  document.getElementById('previewBio').textContent   = user.bio || '';
+  document.getElementById('emailDisplay').value       = user.email;
+  document.getElementById('memberSince').value        = new Date(user.createdAt).toLocaleDateString('pt-BR');
+  document.getElementById('username').value           = user.username;
+  document.getElementById('bio').value                = user.bio || '';
+  document.getElementById('bioCount').textContent     = (user.bio || '').length;
+  document.getElementById('headerAvatar').textContent = user.username.charAt(0).toUpperCase();
+  document.getElementById('avatarPlaceholder').textContent = user.username.charAt(0).toUpperCase();
+
+  const display = document.getElementById('avatarDisplay');
+  if (user.avatarUrl) {
+    display.innerHTML = `<img class="avatar-lg" src="${user.avatarUrl}?t=${Date.now()}" alt="avatar" />`;
+  } else {
+    display.innerHTML = `<div class="avatar-lg-placeholder" id="avatarPlaceholder">${user.username.charAt(0).toUpperCase()}</div>`;
+  }
+}
+
+async function init() {
+  try {
+    const res = await fetch('/api/users/me', { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) { localStorage.clear(); window.location.replace('/home.html'); return; }
+    const { user } = await res.json();
+    renderUser(user);
+  } catch (err) { console.error(err); }
+}
+
+// Bio counter
+document.getElementById('bio').addEventListener('input', function() {
+  document.getElementById('bioCount').textContent = this.value.length;
+  document.getElementById('previewBio').textContent = this.value;
+});
+document.getElementById('username').addEventListener('input', function() {
+  document.getElementById('previewName').textContent = this.value || '—';
+});
+
+// ── Salvar perfil ─────────────────────────────────────────────────────────────
+async function saveProfile() {
+  hideAlert('profileError'); hideAlert('profileSuccess');
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Salvando…';
+
+  try {
+    const res = await fetch('/api/users/me', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:    JSON.stringify({
+        username: document.getElementById('username').value.trim(),
+        bio:      document.getElementById('bio').value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showAlert('profileError', data.error || 'Erro ao salvar.'); return; }
+    renderUser(data.user);
+    localStorage.setItem('patinho_user', JSON.stringify(data.user));
+    showAlert('profileSuccess', 'Perfil salvo com sucesso!', 'success');
+  } catch {
+    showAlert('profileError', 'Erro de conexão.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Salvar alterações';
+  }
+}
+
+// ── Upload de avatar ──────────────────────────────────────────────────────────
+document.getElementById('avatarInput').addEventListener('change', async function() {
+  const file = this.files[0];
+  if (!file) return;
+
+  hideAlert('avatarError'); hideAlert('avatarSuccess');
+
+  const barWrap = document.getElementById('uploadBarWrap');
+  const bar     = document.getElementById('uploadBar');
+  barWrap.classList.add('show');
+
+  // Simula progresso visual
+  let prog = 0;
+  const interval = setInterval(() => { if (prog < 85) { prog += 10; bar.style.width = prog + '%'; } }, 100);
+
+  const form = new FormData();
+  form.append('avatar', file);
+
+  try {
+    const res = await fetch('/api/users/me/avatar', {
+      method:  'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body:    form,
+    });
+    const data = await res.json();
+    clearInterval(interval);
+
+    if (!res.ok) {
+      bar.style.width = '0%';
+      barWrap.classList.remove('show');
+      showAlert('avatarError', data.error || 'Erro ao enviar imagem.', 'error');
+      return;
+    }
+
+    bar.style.width = '100%';
+    setTimeout(() => { barWrap.classList.remove('show'); bar.style.width = '0'; }, 600);
+
+    renderUser(data.user);
+    localStorage.setItem('patinho_user', JSON.stringify(data.user));
+    showAlert('avatarSuccess', 'Foto de perfil atualizada!', 'success');
+  } catch {
+    clearInterval(interval);
+    barWrap.classList.remove('show');
+    showAlert('avatarError', 'Erro de conexão ao enviar a imagem.');
+  }
+
+  this.value = ''; // reset input
+});
+
+init();
+</script>
+</body>
+</html>

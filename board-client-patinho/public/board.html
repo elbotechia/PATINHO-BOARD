@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PATINHO-BOARD — Board</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2128;
+    --border:   #30363d;
+    --accent:   #58a6ff;
+    --green:    #3fb950;
+    --yellow:   #d29922;
+    --purple:   #bc8cff;
+    --red:      #f85149;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --code-bg:  #0d1117;
+    --radius:   10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 700; color: var(--accent); }
+  .logo span { font-size: 1.5rem; }
+  nav a { color: var(--muted); margin-left: 1.5rem; font-size: .9rem; transition: color .2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  .nav-user { display: flex; align-items: center; gap: .75rem; }
+  .avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; color: #000; text-decoration: none; flex-shrink: 0;
+  }
+  .btn-logout {
+    background: transparent; border: none; color: var(--muted);
+    font-size: .85rem; cursor: pointer; padding: .3rem .5rem; border-radius: 6px; transition: color .2s;
+  }
+  .btn-logout:hover { color: var(--red); }
+
+  /* ── Layout ── */
+  .layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 60px); }
+  @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    border-right: 1px solid var(--border); padding: 1.5rem 1rem;
+    position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+  }
+  .sidebar h3 { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .75rem; margin-top: 1.25rem; }
+  .sidebar h3:first-child { margin-top: 0; }
+  .filter-btn {
+    display: block; width: 100%; text-align: left; background: none;
+    border: none; color: var(--muted); padding: .45rem .75rem; border-radius: 6px;
+    cursor: pointer; font-size: .88rem; transition: background .15s, color .15s;
+  }
+  .filter-btn:hover { background: var(--border); color: var(--text); }
+  .filter-btn.active { background: rgba(88,166,255,.15); color: var(--accent); font-weight: 600; }
+
+  /* ── Main ── */
+  .main { padding: 1.5rem; }
+
+  /* ── Toolbar ── */
+  .toolbar { display: flex; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding: .55rem 1rem .55rem 2.4rem;
+    font-size: .9rem;
+  }
+  .search-wrap input:focus { outline: none; border-color: var(--accent); }
+  .search-wrap .icon { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .select-lang {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); padding: .55rem .9rem;
+    font-size: .88rem; cursor: pointer;
+  }
+  .select-lang:focus { outline: none; border-color: var(--accent); }
+
+  /* ── Botões ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .55rem 1.1rem; border-radius: var(--radius);
+    font-size: .88rem; font-weight: 600; cursor: pointer; border: none; transition: opacity .2s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+
+  /* ── Questão card ── */
+  .q-list { display: flex; flex-direction: column; gap: .75rem; }
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    cursor: pointer; transition: border-color .15s; display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .q-card:hover { border-color: var(--accent); }
+  .q-counters { display: flex; flex-direction: column; align-items: center; gap: .4rem; min-width: 52px; }
+  .counter { text-align: center; }
+  .counter .num { font-size: 1.1rem; font-weight: 700; }
+  .counter .lbl { font-size: .68rem; color: var(--muted); }
+  .counter.accepted .num { color: var(--green); }
+  .q-body { flex: 1; min-width: 0; }
+  .q-title { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+  .q-desc  { font-size: .82rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: .5rem; }
+  .q-meta  { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; font-size: .75rem; color: var(--muted); }
+  .badge { display:inline-block; padding:.12rem .5rem; border-radius:20px; font-size:.7rem; font-weight:600; border:1px solid; }
+  .badge-lang   { color:var(--accent);  border-color:var(--accent);  background:rgba(88,166,255,.1); }
+  .badge-tag    { color:var(--muted);   border-color:var(--border);  background:transparent; }
+  .badge-accept { color:var(--green);   border-color:var(--green);   background:rgba(63,185,80,.1); }
+
+  /* ── Empty ── */
+  .empty { text-align:center; padding:4rem 1rem; color:var(--muted); }
+  .empty .big { font-size:3rem; margin-bottom:.75rem; }
+
+  /* ── Modal overlay ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
+    z-index: 500; align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); width: 100%; max-width: 700px;
+    max-height: 90vh; overflow-y: auto; padding: 1.75rem;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+  .modal-title { font-size: 1.1rem; font-weight: 700; }
+  .close-btn { background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+  .close-btn:hover { color: var(--text); }
+
+  /* ── Formulários ── */
+  .form-group { margin-bottom: 1rem; }
+  label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: .35rem; }
+  input[type=text], textarea, select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); padding: .6rem .9rem; font-size: .9rem; font-family: inherit;
+  }
+  input[type=text]:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; }
+  .code-area { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: .83rem; min-height: 120px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+  /* ── Detail view ── */
+  .detail { max-width: 860px; }
+  .detail-back { display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font-size: .85rem; cursor: pointer; margin-bottom: 1.25rem; }
+  .detail-back:hover { color: var(--text); }
+  .detail-title { font-size: 1.3rem; font-weight: 700; margin-bottom: .6rem; }
+  .detail-meta  { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1.5rem; font-size: .8rem; color: var(--muted); align-items: center; }
+  .detail-desc  { color: var(--muted); font-size: .9rem; line-height: 1.6; margin-bottom: 1rem; }
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: .83rem;
+    line-height: 1.55; color: #cdd9e5; margin-bottom: 1.25rem;
+  }
+  .section-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 1.75rem 0 .9rem; font-weight: 700; }
+
+  /* ── Answer card ── */
+  .answer-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: .75rem;
+    display: flex; gap: 1rem;
+  }
+  .answer-card.is-accepted { border-color: var(--green); }
+  .votes-col { display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+  .vote-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); width: 30px; height: 28px; cursor: pointer; font-size: .9rem; display: flex; align-items: center; justify-content: center; }
+  .vote-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .vote-count { font-size: .9rem; font-weight: 700; color: var(--text); }
+  .answer-body { flex: 1; min-width: 0; }
+  .answer-content { font-size: .88rem; line-height: 1.6; color: var(--muted); margin-bottom: .5rem; }
+  .answer-meta { display: flex; gap: .6rem; align-items: center; font-size: .75rem; color: var(--muted); flex-wrap: wrap; }
+  .accept-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); padding: .2rem .6rem; font-size: .75rem; cursor: pointer; }
+  .accept-btn:hover { border-color: var(--green); color: var(--green); }
+  .accept-btn.accepted { border-color: var(--green); color: var(--green); background: rgba(63,185,80,.1); }
+  .accepted-badge { color: var(--green); font-weight: 700; font-size: .8rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/index.html">
+    <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+      <ellipse cx="24" cy="30" rx="14" ry="11" fill="#58a6ff" opacity=".9"/>
+      <ellipse cx="24" cy="19" rx="9" ry="9" fill="#58a6ff"/>
+      <ellipse cx="27.5" cy="17" rx="2.5" ry="2.5" fill="white"/>
+      <ellipse cx="28.5" cy="17.5" rx="1" ry="1" fill="#0d1117"/>
+      <path d="M32 20 Q38 19 36 23 Q34 25 30 23 Z" fill="#f0a500"/>
+    </svg>
+    PATINHO-BOARD
+  </a>
+  <nav>
+    <a href="/index.html">Dashboard</a>
+    <a href="/board.html" class="active">Board</a>
+    <a href="/profile.html">Perfil</a>
+    <a href="/settings.html">Configurações</a>
+  </nav>
+  <div class="nav-user">
+    <a href="/profile.html" class="avatar-placeholder" id="headerAvatar" title="Meu perfil">?</a>
+    <button class="btn-logout" onclick="logout()" title="Sair">Sair</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3>Filtrar por</h3>
+    <button class="filter-btn active" data-lang="">Todas</button>
+    <button class="filter-btn" data-lang="javascript">🟨 JavaScript</button>
+    <button class="filter-btn" data-lang="typescript">🔷 TypeScript</button>
+    <button class="filter-btn" data-lang="python">🐍 Python</button>
+    <button class="filter-btn" data-lang="java">☕ Java</button>
+    <button class="filter-btn" data-lang="html">🌐 HTML/CSS</button>
+    <button class="filter-btn" data-lang="c++">⚙️ C++</button>
+    <button class="filter-btn" data-lang="c#">💜 C#</button>
+    <button class="filter-btn" data-lang="go">🐹 Go</button>
+    <button class="filter-btn" data-lang="rust">🦀 Rust</button>
+    <button class="filter-btn" data-lang="php">🐘 PHP</button>
+    <button class="filter-btn" data-lang="ruby">💎 Ruby</button>
+  </aside>
+
+  <!-- Conteúdo principal -->
+  <main class="main" id="main-content">
+    <!-- Lista de perguntas -->
+    <div id="list-view">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Pesquisar perguntas..." />
+        </div>
+        <button class="btn btn-primary" id="ask-btn">+ Nova Pergunta</button>
+      </div>
+      <div class="q-list" id="q-list">
+        <!-- carregado via JS -->
+      </div>
+    </div>
+
+    <!-- Detalhe da pergunta -->
+    <div id="detail-view" style="display:none" class="detail"></div>
+  </main>
+</div>
+
+<!-- ── Modal: Nova Pergunta ── -->
+<div class="modal-overlay" id="ask-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Fazer Pergunta</div>
+      <button class="close-btn" id="ask-close">×</button>
+    </div>
+    <form id="ask-form">
+      <div class="form-group">
+        <label>Título *</label>
+        <input type="text" name="title" placeholder="Ex.: Como tratar erro de CORS no Express?" required />
+      </div>
+      <div class="form-group">
+        <label>Descrição *</label>
+        <textarea name="description" placeholder="Descreva o problema com detalhes..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Trecho de Código</label>
+        <textarea name="code_snippet" class="code-area" placeholder="// cole o código aqui..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Linguagem</label>
+          <select name="language">
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="html">HTML/CSS</option>
+            <option value="c++">C++</option>
+            <option value="c#">C#</option>
+            <option value="go">Go</option>
+            <option value="rust">Rust</option>
+            <option value="php">PHP</option>
+            <option value="ruby">Ruby</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tags (separadas por vírgula)</label>
+          <input type="text" name="tags" placeholder="ex: node, api, cors" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Seu nome *</label>
+        <input type="text" name="author" placeholder="Seu apelido ou nome" required />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Publicar Pergunta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── Modal: Nova Resposta ── -->
+<div class="modal-overlay" id="answer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Responder</div>
+      <button class="close-btn" id="answer-close">×</button>
+    </div>
+    <form id="answer-form">
+      <input type="hidden" name="question_id" />
+      <div class="form-group">
+        <label>Sua Resposta *</label>
+        <textarea name="content" placeholder="Explique como resolver o problema..." required style="min-height:120px"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Código da Solução (opcional)</label>
+        <textarea name="code_snippet" class="code-area" placeholder="// solução em código..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Seu nome *</label>
+        <input type="text" name="author" placeholder="Seu apelido ou nome" required />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Publicar Resposta</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let currentLang = '';
+let currentQ    = null;
+let debounceTimer;
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function timeSince(dateStr) {
+  const diff = Date.now() - new Date(dateStr);
+  const m = Math.floor(diff / 60000);
+  if (m < 2)  return 'agora';
+  if (m < 60) return `há ${m}min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `há ${h}h`;
+  return `há ${Math.floor(h/24)}d`;
+}
+function tags(str) {
+  return (str||'').split(',').map(t=>t.trim()).filter(Boolean)
+    .map(t=>`<span class="badge badge-tag">${esc(t)}</span>`).join(' ');
+}
+
+// ── API calls ─────────────────────────────────────────────────────────────────
+async function fetchQuestions(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const r  = await fetch(`${API}/questions${qs ? '?' + qs : ''}`);
+  return r.json();
+}
+async function fetchQuestion(id) {
+  const r = await fetch(`${API}/questions/${id}`);
+  return r.json();
+}
+
+// ── Renderizar lista ──────────────────────────────────────────────────────────
+async function renderList() {
+  const qEl   = document.getElementById('q-list');
+  const query = document.getElementById('search-input').value.trim();
+  qEl.innerHTML = '<div style="color:var(--muted);padding:2rem;text-align:center">Carregando...</div>';
+
+  try {
+    const params = {};
+    if (currentLang) params.lang = currentLang;
+    if (query)       params.q    = query;
+    const list = await fetchQuestions(params);
+
+    if (!list.length) {
+      qEl.innerHTML = `<div class="empty"><div class="big">🦆</div>Nenhuma pergunta encontrada.<br>Que tal fazer a primeira?</div>`;
+      return;
+    }
+
+    qEl.innerHTML = list.map(q => {
+      const accepted = q.answer_count > 0;
+      return `
+        <div class="q-card" data-id="${q.id}">
+          <div class="q-counters">
+            <div class="counter ${accepted ? 'accepted' : ''}">
+              <div class="num">${q.answer_count}</div>
+              <div class="lbl">resp.</div>
+            </div>
+            <div class="counter">
+              <div class="num" style="font-size:.85rem;color:var(--muted)">👁${q.views}</div>
+            </div>
+          </div>
+          <div class="q-body">
+            <div class="q-title">${esc(q.title)}</div>
+            <div class="q-desc">${esc(q.description)}</div>
+            <div class="q-meta">
+              <span class="badge badge-lang">${esc(q.language)}</span>
+              ${tags(q.tags)}
+              <span>por <strong>${esc(q.author)}</strong></span>
+              <span>${timeSince(q.created_at)}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    qEl.querySelectorAll('.q-card').forEach(el =>
+      el.addEventListener('click', () => openDetail(el.dataset.id))
+    );
+
+    // ir direto para pergunta se anchor #qNN
+    const hash = location.hash.match(/^#q(\d+)$/);
+    if (hash) openDetail(hash[1]);
+  } catch(e) {
+    qEl.innerHTML = `<div class="empty">Erro ao carregar. Servidor ligado?</div>`;
+  }
+}
+
+// ── Detalhe da pergunta ───────────────────────────────────────────────────────
+async function openDetail(id) {
+  const detailEl = document.getElementById('detail-view');
+  const listEl   = document.getElementById('list-view');
+  detailEl.innerHTML = '<div style="color:var(--muted);padding:2rem">Carregando...</div>';
+  listEl.style.display   = 'none';
+  detailEl.style.display = 'block';
+  history.replaceState(null,'',`#q${id}`);
+
+  try {
+    const q = await fetchQuestion(id);
+    currentQ = q;
+    renderDetail(q);
+  } catch(e) {
+    detailEl.innerHTML = '<div class="empty">Erro ao carregar pergunta.</div>';
+  }
+}
+
+function renderDetail(q) {
+  const detailEl = document.getElementById('detail-view');
+  const codeBlock = q.code_snippet
+    ? `<pre class="code-block"><code>${esc(q.code_snippet)}</code></pre>` : '';
+
+  const answersHtml = q.answers && q.answers.length
+    ? q.answers.map(a => renderAnswer(a, q.id)).join('')
+    : '<div class="empty" style="padding:1.5rem">Nenhuma resposta ainda. Seja o primeiro!</div>';
+
+  detailEl.innerHTML = `
+    <div class="detail-back" id="back-btn">← Voltar ao board</div>
+    <div class="detail-title">${esc(q.title)}</div>
+    <div class="detail-meta">
+      <span class="badge badge-lang">${esc(q.language)}</span>
+      ${tags(q.tags)}
+      <span>por <strong>${esc(q.author)}</strong></span>
+      <span>${timeSince(q.created_at)}</span>
+      <span>👁 ${q.views} visualizações</span>
+    </div>
+    <div class="detail-desc">${esc(q.description)}</div>
+    ${codeBlock}
+
+    <div class="section-title">
+      ${q.answers ? q.answers.length : 0} Resposta${q.answers && q.answers.length !== 1 ? 's' : ''}
+    </div>
+    <div id="answers-container">${answersHtml}</div>
+
+    <button class="btn btn-primary" id="add-answer-btn" style="margin-top:1rem">✏️ Responder</button>
+  `;
+
+  document.getElementById('back-btn').addEventListener('click', () => {
+    document.getElementById('list-view').style.display  = 'block';
+    document.getElementById('detail-view').style.display = 'none';
+    history.replaceState(null,'',location.pathname);
+    currentQ = null;
+  });
+
+  document.getElementById('add-answer-btn').addEventListener('click', () => {
+    document.querySelector('#answer-form [name=question_id]').value = q.id;
+    document.getElementById('answer-modal').classList.add('open');
+  });
+
+  // Votos
+  detailEl.querySelectorAll('.vote-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const aid = btn.dataset.id;
+      const dir = btn.dataset.dir;
+      await fetch(`${API}/answers/${aid}/vote`, {
+        method: 'PATCH', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ direction: dir }),
+      });
+      const updated = await fetchQuestion(q.id);
+      currentQ = updated;
+      renderDetail(updated);
+    });
+  });
+
+  // Aceitar resposta
+  detailEl.querySelectorAll('.accept-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const aid = btn.dataset.id;
+      await fetch(`${API}/answers/${aid}/accept`, { method: 'PATCH' });
+      const updated = await fetchQuestion(q.id);
+      currentQ = updated;
+      renderDetail(updated);
+    });
+  });
+}
+
+function renderAnswer(a, qId) {
+  const code = a.code_snippet ? `<pre class="code-block" style="margin-top:.6rem"><code>${esc(a.code_snippet)}</code></pre>` : '';
+  const acceptBtn = a.is_accepted
+    ? `<span class="accepted-badge">✔ Aceita</span>`
+    : `<button class="accept-btn" data-id="${a.id}">✔ Aceitar</button>`;
+  return `
+    <div class="answer-card ${a.is_accepted ? 'is-accepted' : ''}">
+      <div class="votes-col">
+        <button class="vote-btn" data-id="${a.id}" data-dir="up">▲</button>
+        <span class="vote-count">${a.votes}</span>
+        <button class="vote-btn" data-id="${a.id}" data-dir="down">▼</button>
+      </div>
+      <div class="answer-body">
+        <div class="answer-content">${esc(a.content)}</div>
+        ${code}
+        <div class="answer-meta">
+          ${acceptBtn}
+          <span>por <strong>${esc(a.author)}</strong></span>
+          <span>${timeSince(a.created_at)}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Sidebar filtros ───────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLang = btn.dataset.lang;
+    renderList();
+  });
+});
+
+// ── Search ────────────────────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(renderList, 350);
+});
+
+// ── Modal: Nova Pergunta ──────────────────────────────────────────────────────
+document.getElementById('ask-btn').addEventListener('click', () =>
+  document.getElementById('ask-modal').classList.add('open')
+);
+document.getElementById('ask-close').addEventListener('click', () =>
+  document.getElementById('ask-modal').classList.remove('open')
+);
+document.getElementById('ask-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd   = new FormData(e.target);
+  const body = Object.fromEntries(fd.entries());
+  try {
+    const r = await fetch(`${API}/questions`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error((await r.json()).error);
+    e.target.reset();
+    document.getElementById('ask-modal').classList.remove('open');
+    renderList();
+  } catch(err) { alert('Erro: ' + err.message); }
+});
+
+// ── Modal: Nova Resposta ──────────────────────────────────────────────────────
+document.getElementById('answer-close').addEventListener('click', () =>
+  document.getElementById('answer-modal').classList.remove('open')
+);
+document.getElementById('answer-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd  = new FormData(e.target);
+  const qId = fd.get('question_id');
+  const body = { content: fd.get('content'), code_snippet: fd.get('code_snippet'), author: fd.get('author') };
+  try {
+    const r = await fetch(`${API}/questions/${qId}/answers`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error((await r.json()).error);
+    e.target.reset();
+    document.getElementById('answer-modal').classList.remove('open');
+    if (currentQ) {
+      const updated = await fetchQuestion(currentQ.id);
+      currentQ = updated;
+      renderDetail(updated);
+    }
+  } catch(err) { alert('Erro: ' + err.message); }
+});
+
+// Fechar modais ao clicar fora
+document.querySelectorAll('.modal-overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); })
+);
+
+// ── Auth guard ───────────────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem('patinho_token');
+  localStorage.removeItem('patinho_user');
+  window.location.replace('/home.html');
+}
+const _boardToken = localStorage.getItem('patinho_token');
+if (!_boardToken) {
+  window.location.replace('/home.html');
+} else {
+  fetch('/api/auth/me', { headers: { Authorization: `Bearer ${_boardToken}` } })
+    .then(r => { if (!r.ok) { logout(); return null; } return r.json(); })
+    .then(d => {
+      if (!d) return;
+      const av = document.getElementById('headerAvatar');
+      if (av) av.textContent = d.user.username.charAt(0).toUpperCase();
+    })
+    .catch(logout);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderList();
+</script>
+</body>
+</html>
